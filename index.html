@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베니스 비엔날레 — 박은수의 줌인아트(zoom-in-Art)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A96E;--gold-light:#E8D5A3;--gold-dark:#8B6914;
+  --ink:#1A1714;--ink-mid:#3D3830;--ink-muted:#6B6355;
+  --paper:#F5F0E8;--paper-dark:#EAE3D5;--cream:#FAF7F2;
+  --border:rgba(201,169,110,0.3);--border-s:rgba(201,169,110,0.6);
+}
+html{scroll-behavior:smooth}
+body{font-family:"Noto Serif KR",serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+header{background:var(--ink);color:var(--gold-light);text-align:center;padding:24px 40px 20px;border-bottom:1px solid var(--gold-dark)}
+.h-eye{font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;font-weight:300}
+header h1{font-family:"Cormorant Garamond",serif;font-size:34px;font-weight:300;letter-spacing:5px;text-transform:uppercase;color:var(--paper)}
+header h1 em{font-style:italic;color:var(--gold-light)}
+.h-sub{font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:3px;color:var(--gold);margin-top:8px;font-weight:200;opacity:.8}
+.tab-bar{background:var(--ink-mid);display:flex;border-bottom:1px solid rgba(201,169,110,0.2)}
+.tab{padding:14px 28px;font-family:"Montserrat",sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(201,169,110,0.5);cursor:pointer;border:none;background:none;transition:all .2s;font-weight:300;border-bottom:2px solid transparent}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:hover:not(.active){color:rgba(201,169,110,0.8)}
+.layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 128px)}
+.img-panel{background:var(--ink);padding:24px 16px;border-right:1px solid rgba(201,169,110,0.15);position:sticky;top:0;height:calc(100vh - 128px);overflow-y:auto}
+.panel-label{font-family:"Montserrat",sans-serif;font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel-label::after{content:"";flex:1;height:1px;background:rgba(201,169,110,0.2)}
+.hint-text{font-family:"Cormorant Garamond",serif;font-size:12px;font-style:italic;color:rgba(201,169,110,0.35);margin-bottom:14px;line-height:1.5;font-weight:300}
+.img-card{position:relative;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;background:var(--ink-mid);margin-bottom:4px}
+.img-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.img-card:hover img{transform:scale(1.04)}
+.img-card.selected{border-color:var(--gold)}
+.img-card.selected::after{content:"✓";position:absolute;top:5px;right:5px;width:18px;height:18px;background:var(--gold);color:var(--ink);font-size:10px;display:flex;align-items:center;justify-content:center;font-family:"Montserrat",sans-serif;font-weight:600;border-radius:50%}
+.img-card .sec-badge{position:absolute;bottom:0;left:0;right:0;padding:6px 8px;background:linear-gradient(transparent,rgba(26,23,20,.88));font-family:"Montserrat",sans-serif;font-size:7px;letter-spacing:1px;color:var(--gold-light);text-transform:uppercase;font-weight:300;opacity:0;transition:opacity .2s}
+.img-card:hover .sec-badge,.img-card.selected .sec-badge{opacity:1}
+.sec-group{margin-bottom:18px}
+.sec-num{font-family:"Montserrat",sans-serif;font-size:7px;letter-spacing:3px;color:rgba(201,169,110,0.4);text-transform:uppercase;margin-bottom:7px;font-weight:300}
+.img-row{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.sel-actions{padding:12px 0 4px;border-top:1px solid rgba(201,169,110,0.12);margin-top:6px}
+.sel-count{font-family:"Montserrat",sans-serif;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:10px}
+.view-btn{width:100%;padding:11px;background:var(--gold-dark);border:1px solid var(--gold);color:var(--paper);font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:400;transition:all .2s}
+.view-btn:hover{background:var(--gold);color:var(--ink)}
+.view-btn:disabled{opacity:.35;cursor:not-allowed}
+.clear-btn{width:100%;padding:8px;background:transparent;border:1px solid rgba(201,169,110,0.2);color:rgba(201,169,110,0.45);font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:300;transition:all .2s;margin-top:6px}
+.clear-btn:hover{border-color:var(--gold);color:var(--gold)}
+.article-panel{background:var(--cream);overflow-y:auto;height:calc(100vh - 128px)}
+.article-viewer{padding:44px 52px;max-width:780px}
+.av-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;gap:16px;text-align:center;padding:60px}
+.av-empty p{font-family:"Cormorant Garamond",serif;font-size:18px;font-style:italic;color:var(--ink-muted);font-weight:300;line-height:1.6}
+.av-empty span{font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:3px;color:var(--ink-muted);opacity:.5;text-transform:uppercase}
+.art-kicker{font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:12px}
+.art-title{font-family:"Cormorant Garamond",serif;font-size:36px;font-weight:300;line-height:1.1;color:var(--ink);margin-bottom:20px;letter-spacing:.5px}
+.art-intro{font-family:"Cormorant Garamond",serif;font-size:19px;font-weight:400;line-height:1.7;color:var(--ink-mid);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);font-style:italic}
+.art-divider{height:1px;background:var(--border);margin:32px 0}
+.art-section{margin-bottom:36px;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sec-label{font-family:"Montserrat",sans-serif;font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--border)}
+.sec-title{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:400;color:var(--ink);margin-bottom:16px;line-height:1.3}
+.sec-imgs{display:flex;gap:8px;margin-bottom:8px}
+.sec-imgs img{flex:1;object-fit:cover;display:block;border:1px solid var(--border);filter:sepia(6%);max-height:260px}
+.sec-caption{font-family:"Montserrat",sans-serif;font-size:9px;color:var(--ink-muted);font-weight:300;margin-bottom:18px;line-height:1.5;font-style:italic}
+.sec-body{font-size:16px;line-height:1.95;color:var(--ink-mid);font-weight:300}
+.sec-body p{margin-bottom:16px}
+.sec-body p:first-child::first-letter{font-family:"Cormorant Garamond",serif;font-size:50px;float:left;margin-right:5px;line-height:.85;color:var(--gold-dark);font-weight:300;margin-top:6px}
+.sec-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.sec-chip{padding:5px 14px;border:1px solid var(--border-s);font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:2px;color:var(--gold-dark);text-transform:uppercase;cursor:pointer;transition:all .2s;background:transparent}
+.sec-chip:hover{background:var(--gold-dark);color:var(--paper);border-color:var(--gold-dark)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gold-dark)}
+.screen{display:none}
+.screen.active{display:block}
+header{position:relative}
+.back-btn{position:absolute;left:24px;top:24px;background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);font-family:"Montserrat",sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all .2s}
+.back-btn:hover{border-color:var(--gold);background:rgba(201,169,110,0.08)}
+.home-header{background:var(--ink);color:var(--gold-light);text-align:center;padding:64px 40px}
+.home-title{font-family:"Cormorant Garamond",serif;font-size:48px;font-weight:300;letter-spacing:6px;text-transform:uppercase;color:var(--paper);cursor:pointer;transition:color .2s;display:inline-block}
+.home-title em{font-style:italic;color:var(--gold-light)}
+.home-title:hover{color:var(--gold)}
+.marquee-wrap{overflow:hidden;background:var(--ink-mid);padding:24px 0;border-top:1px solid rgba(201,169,110,0.15);border-bottom:1px solid rgba(201,169,110,0.15)}
+.marquee-track{display:flex;gap:12px;width:max-content;animation:marquee 60s linear infinite}
+.marquee-track img{height:320px;width:auto;object-fit:cover;flex-shrink:0;cursor:pointer;border:1px solid rgba(201,169,110,0.15);filter:sepia(6%);transition:filter .2s,transform .3s}
+.marquee-track img:hover{filter:sepia(0%);transform:scale(1.02)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.home-menu{display:flex;background:var(--ink-mid);border-bottom:1px solid rgba(201,169,110,0.2)}
+.menu-item{flex:1;padding:16px;background:none;border:none;color:rgba(201,169,110,0.7);font-family:"Montserrat",sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .2s;font-weight:300;border-bottom:2px solid transparent}
+.menu-item:hover{color:var(--gold);background:rgba(201,169,110,0.06);border-bottom-color:var(--gold)}
+.menu-item.active{color:var(--gold);border-bottom-color:var(--gold)}
+#screenGallery{min-height:100vh;background:var(--paper-dark)}
+.gallery-content{margin:0 auto;background:var(--cream);padding:44px 52px;max-width:780px;font-family:"Cormorant Garamond",serif;font-size:17px;line-height:1.8;color:var(--ink-mid)}
+.gallery-content p{margin-bottom:16px;text-indent:1.5em}
+@media (max-width:640px){
+  .gallery-content{padding:28px 20px;font-size:15px}
+  .home-menu{flex-wrap:wrap}
+  .menu-item{flex:1 1 50%}
+}
+</style>
+</head>
+<body>
+<div id="screenHome" class="screen active">
+  <header class="home-header">
+    <h1 class="home-title" onclick="goToArticle('choi',true)">Venice <em>Biennale</em> 2026</h1>
+  </header>
+  <nav class="home-menu">
+    <button class="menu-item" onclick="goToArticle('choi')">최고은 작가 — Meridian</button>
+    <button class="menu-item" onclick="goToArticle('lee')">이윤 학생 — 베니스 참관기</button>
+    <button class="menu-item" onclick="goToGallery()">박은수의 문화갤러리</button>
+  </nav>
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+</div>
+<div id="screenGallery" class="screen">
+  <header>
+    <button class="back-btn" onclick="goHome()">← 처음으로</button>
+    <p class="h-eye">La Serenissima · 박은수의 줌인아트(zoom-in-Art)</p>
+    <h1>박은수의 <em>문화갤러리</em></h1>
+    <p class="h-sub">이미지로 만나는 문화예술 뉴스 아카이브</p>
+  </header>
+  <nav class="home-menu">
+    <button class="menu-item" onclick="goToArticle('choi')">최고은 작가 — Meridian</button>
+    <button class="menu-item" onclick="goToArticle('lee')">이윤 학생 — 베니스 참관기</button>
+    <button class="menu-item active" onclick="goToGallery()">박은수의 문화갤러리</button>
+  </nav>
+  <div class="gallery-content">
+    <p>문화갤러리는 문화예술 현장의 다양한 소식들을 심층적으로 취재하고 전달하는 이미지 기반 뉴스 아카이브입니다. 독자는 관심 있는 이미지를 직접 선택해 각 이미지와 연결된 기사, 인터뷰, 현장 기록을 자유롭게 탐색할 수 있으며, 이를 통해 자신만의 문화 갤러리를 구성할 수 있습니다.</p>
+    <p>전시, 공연, 미술, 디자인, 문화정책 등 다양한 문화 분야의 이야기를 하나의 화면에 모아 살펴볼 수 있도록 구성했으며, 단순한 정보 전달을 넘어 현장의 분위기와 맥락까지 함께 담아내고자 했습니다. 이미지를 중심으로 뉴스를 탐색하는 새로운 방식의 문화 저널리즘을 경험해보세요.</p>
+    <p>이번 문화갤러리는 세계 최대 규모의 현대미술 축제 가운데 하나인 '2026 베니스 비엔날레'를 소개합니다. 올해로 제61회를 맞이한 베니스 비엔날레는 2026년 5월부터 11월까지 이탈리아 베니스 전역에서 개최되며, 세계 각국의 예술가와 관람객들이 모여 동시대 미술의 흐름을 공유하는 장이 되고 있습니다.</p>
+    <p>특히 한국관은 「해방공간: 요새와 둥지」를 주제로 참여해 급변하는 사회 속에서 공간과 공동체의 의미를 새롭게 탐구하고 있습니다. 문화갤러리는 이번 비엔날레 한국관 참여 작가인 최고은 작가와의 심층 인터뷰를 통해 작품에 담긴 의도와 제작 과정을 취재했으며, 현장을 직접 방문한 서울대학교 조소과 학생과의 인터뷰를 통해 관람객의 시선에서 바라본 베니스의 풍경과 경험을 기록했습니다.</p>
+    <p>작품에 담긴 의미, 국가관과 병행전시의 현장, 그리고 베니스라는 도시에서 펼쳐지는 거대한 예술 축제의 모습까지. 문화갤러리가 전하는 생생한 기록을 통해 2026 베니스 비엔날레를 더욱 깊이 만나보시기 바랍니다.</p>
+  </div>
+</div>
+<div id="screenArticle" class="screen">
+  <header>
+    <button class="back-btn" onclick="goHome()">← 처음으로</button>
+    <p class="h-eye">La Serenissima · 박은수의 줌인아트(zoom-in-Art)</p>
+    <h1>Venice <em>Biennale</em> 2026</h1>
+    <p class="h-sub">이미지를 클릭해 소주제를 선택 → 기사 보기</p>
+  </header>
+  <div class="tab-bar">
+    <button class="tab" data-tab="choi" onclick="switchTab('choi')">최고은 작가 — Meridian</button>
+    <button class="tab" data-tab="lee" onclick="switchTab('lee')">이윤 학생 — 베니스 참관기</button>
+  </div>
+  <div class="layout">
+    <div class="img-panel" id="imgPanel">
+      <p class="panel-label">이미지 아카이브</p>
+      <p class="hint-text">이미지를 클릭해 소주제를 선택하면 해당 기사 내용이 나타납니다</p>
+      <div id="imgGrid"></div>
+      <div class="sel-actions">
+        <p class="sel-count" id="selCount">선택된 소주제: 0</p>
+        <button class="view-btn" id="viewBtn" onclick="viewSelected()" disabled>✦ &nbsp;기사 보기</button>
+        <button class="clear-btn" onclick="clearSelection()">선택 해제</button>
+      </div>
+    </div>
+    <div class="article-panel" id="articlePanel">
+      <div class="article-viewer" id="articleViewer">
+        <div class="av-empty">
+          <p>좌측에서 이미지를 선택하면<br>관련 기사가 이곳에 나타납니다</p>
+          <span>Click images on the left to explore articles</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="images.js"></script>
+<script>
+const ARTICLES={"choi": {"title": "갈라진 파이프, 열린 경계 — 최고은의 「Meridian」", "subtitle": "2026 베니스 비엔날레 한국관", "intro": "벽 속에 숨어 있던 파이프가 한국관을 관통하며 뻗어 나간다. 작가 최고은이 베니스 자르디니에서 묻고자 한 것은 단 하나다. 이 경계들은 실제로 어떻게 작동하고 있는가.", "sections": [{"id": "choi_s1", "title": "벽 속에 숨은 파이프, 몸을 관통하는 침술", "images": ["choi_1", "choi_3"], "captions": ["「Meridian」의 재료가 될 동 파이프 더미 앞에 선 최고은 작가.", "한국관 중심 기둥의 내부. 평소라면 벽 안에 감춰져 있었을 배관과 전선들이 고스란히 드러나 있다."], "content": "최고은은 파이프를 오랫동안 작업의 재료로 삼아왔다. 그에게 파이프는 단순한 산업재료가 아니라 '흐름을 조직하는 구조'다.\n\n\"파이프는 물과 에너지의 이동을 가능하게 하지만 대부분 벽 안이나 바닥 아래 숨어 있기 때문에 평소에는 거의 인식되지 않습니다. 가전제품이나 가구, 배관과 같은 기성 시스템 역시 마찬가지입니다. 우리의 삶을 실제로 지탱하지만 잘 드러나지 않는 구조들이죠.\"\n\n비가시적 인프라에 대한 이 오래된 관심이 이번 작업에서는 국가관이라는 장소와 만나면서 개념적으로 확장되었다. 제목 'Meridian'에는 두 겹의 의미가 담겨 있다. 지리학적으로는 북극과 남극을 잇는 자오선을, 동양 의학에서는 인체 안에서 기가 흐르는 경락을 가리킨다.\n\n\"파이프는 침술의 바늘처럼 작동하기도 합니다. 상처를 내지만 동시에 회복을 위한 개입이며, 분리를 전제로 한 경계에 새로운 연결을 만들어내는 도구이기도 합니다.\""}, {"id": "choi_s2", "title": "완결되지 않은 건축 — 국가관과 해방 사이", "images": ["choi_2", "choi_4"], "captions": ["베니스 비엔날레 자르디니 내 한국관 전경. 동 파이프가 외벽을 따라 뻗어 있다.", "비엔날레 한국관 내부의 모습."], "content": "자르디니의 국가관 체제는 화려하지만 모순적이다. 각 나라는 자국의 건축과 작업으로 존재를 과시하지만, 그 건물들은 서로 불과 몇 걸음 거리에 붙어 있다. 최고은은 이 구조를 '정체성을 선언하는 공간이라기보다 관계를 시험하는 공간'으로 바라본다.\n\n\"완결된 국가의 상징이라기보다 지금도 계속 만들어지고 있는 상태처럼 느껴졌습니다.\"\n\n이 감각은 이번 전시의 핵심 키워드인 '해방공간'과 맞닿아 있다. 최고은은 해방을 과거의 특정 시기가 아니라 아직 완결되지 않은 가능성의 상태로 읽는다.\n\n\"저는 해방을 어떤 이상적인 자유의 상태라기보다, 서로 다른 존재와 조건들이 끊임없이 관계를 조정하며 만들어가는 과정으로 생각합니다. 도달해야 할 목적지라기보다 지속적으로 유지하고 돌봐야 하는 상태에 더 가깝다고 느낍니다.\""}, {"id": "choi_s3", "title": "경계 위의 협업 — 수풀, 파이프, 그리고 팔레스타인까지", "images": ["choi_5"], "captions": ["오픈식 날, 최고은 작가(좌측)가 최빛나 예술감독, 노혜리 작가, 그리고 펠로우들과 함께 한국관 앞에 섰다."], "content": "답사 과정에서 최고은의 시선을 사로잡은 것은 뜻밖의 장면이었다. 한국관과 일본관 사이, 낮게 자란 수풀이었다. 일본관이 식물로 경계를 표시하고 있었지만, 사람들은 그 경계를 크게 의식하지 않았다.\n\n\"생각해보면 한국과 일본은 식민지 역사 때문에 특별한 의미로 읽히지만, 동시에 가장 가까운 이웃이기도 합니다. 그것은 국경을 지우려는 행위라기보다, 경계가 실제로 어떻게 작동하는지를 다시 생각해보게 하는 작은 개입에 가깝습니다.\"\n\n경계에 대한 이 질문은 한국과 일본 사이에서만 머물지 않는다. 올해 비엔날레는 팔레스타인 연대 시위와 국가관 참가 논쟁이 전시장 안팎을 달구며 예년과 달리 무거운 공기 속에서 열렸다.\n\n\"예술이 직접적으로 문제를 해결할 수 있다고 생각하지는 않습니다. 하지만 보이지 않던 관계를 드러내고, 익숙한 질서를 다른 시각으로 바라보게 하며, 서로 다른 경험들이 만날 수 있는 공간을 만드는 일은 여전히 가능하다고 생각합니다.\""}]}, "lee": {"title": "\"비엔날레보다도 베니스였어요\"", "subtitle": "베니스 비엔날레 참관기", "intro": "대학생 이윤(서울대학교 조소과 3학년)은 학기 중 일탈하듯 비행기에 올라 베니스로 향했다. 기대와 피로, 그리고 그가 보았던 베니스와 비엔날레에 관한 이야기를 들었다.", "sections": [{"id": "lee_s1", "title": "도시 전체가 전시장이었다, 베니스 곳곳을 채운 미술들", "images": ["lee_1"], "captions": ["비엔날레 기간의 베니스. 자르디니와 아르세날레 외에도 도시 곳곳에서 수많은 전시가 열린다."], "content": "베니스에 도착했을 때 이윤 씨가 처음 느낀 것은 비엔날레가 아니라 도시 자체였다. 배를 타고 이동하는 물길, 화려하지만 인위적이지 않은 다채로운 색감. 그리고 도시 곳곳에 들어찬 전시들.\n\n비엔날레 기간의 베니스는 자르디니와 아르세날레의 본전시 외에도, 유서 깊은 건물과 골목 곳곳에서 수많은 개인전과 특별전이 동시에 열린다. 이 씨는 그 밀도에 먼저 압도됐다고 말했다.\n\n\"비엔날레만 중요한 줄 알았는데, 도시 전체에서 열리는 전시들의 밀도가 정말 높았어요. 오히려 비엔날레를 못 보더라도 주변 전시만으로도 충분히 의미 있겠다는 생각이 들 정도였어요.\""}, {"id": "lee_s2", "title": "도시 베니스에서의 '원픽'은, 아니쉬 카푸어의 개인전", "images": ["lee_2", "lee_3"], "captions": ["아니쉬 카푸어 개인전 전시장 내부.", "역사적 건물과 거대한 작업이 만들어내는 압도적인 시너지."], "content": "이 씨에게 도시 곳곳의 전시들 중 가장 강하게 기억에 남은 것은 아니쉬 카푸어의 개인전이었다. 실제로 사용됐던 역사적인 건물 전체를 작업으로 채운 전시였다.\n\n\"내부 공간이 크고 층고도 높아 그의 거대한 작업들이 공간과 합쳐져 압도적인 시너지를 내뿜었던 것 같습니다.\"\n\n카푸어 전시장은 기존의 화이트큐브 안에 작품을 배치하는 방식과는 전혀 다른 경험을 선사했다. 수백 년의 시간이 쌓인 건물이 그 자체로 맥락이 되고, 그 위에서 작업은 전혀 다른 무게를 갖게 된다. 이 씨는 이것이 베니스라는 도시에서만 가능한 경험이라고 말했다."}, {"id": "lee_s3", "title": "동시대 미술이 한 공간에, 너무 방대해 / 반복되는 주제와 형식", "images": ["lee_4"], "captions": ["비엔날레 본전시장. 수백 개의 작품들이 거대한 공간을 채우고 있다."], "content": "비엔날레 본전시 앞에서는 또 다른 감각이 찾아왔다. 이 씨는 그날을 '태어나서 시간 내에 가장 많은 작업들과 작가들을 본 날'이라고 표현했다.\n\n\"거대한 공간에 밀도 높은 수백 개의 작품들로 구성되어 있다 보니 후반부에는 시간에 쫓겨 작업들을 거의 지나치듯이 봤고, 너무 많은 정보량으로 인해 나중에는 하나의 과제를 끝낸다는 생각으로 기계적인 관찰을 수행했습니다.\"\n\n이 씨는 비엔날레의 가장 큰 의의를 이렇게 정리했다. 지금 미술계에서 가장 뜨겁게 대두되는 담론들을 한자리에서 볼 수 있다는 것. 그러나 올해는 그 기대가 온전히 채워지지는 않았다고도 솔직하게 말했다.\n\n\"이번 비엔날레는 언제나 봤던 주제가 늘 그 자리에 있는 느낌이라, 개인적으로 기대했던 것만큼 신선하게 다가오는 작업들이 적었습니다.\"\n\n그 모든 피로와 의문에도 불구하고, 이 씨는 비엔날레를 강하게 추천했다. '특히 미술 전공생이시라면 인생에서 한 번쯤은 꼭 가봐야 한다'고.\""}]}};
+
+let currentTab="choi";
+let selected=new Set();
+
+function activateTab(tab){
+  currentTab=tab;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tab));
+  renderImageGrid();
+}
+
+function switchTab(tab){
+  selected.clear();
+  activateTab(tab);
+  renderEmpty();
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function goHome(){
+  showScreen("screenHome");
+}
+
+function goToGallery(){
+  showScreen("screenGallery");
+}
+
+function goToArticle(tab,full){
+  selected.clear();
+  if(full)ARTICLES[tab].sections.forEach(s=>selected.add(s.id));
+  activateTab(tab);
+  if(full)viewSelected();else renderEmpty();
+  showScreen("screenArticle");
+}
+
+function goToImage(imgId){
+  const ref=IMG_INDEX[imgId];
+  if(!ref)return;
+  selected.clear();
+  selected.add(ref.secId);
+  activateTab(ref.tab);
+  viewSelected();
+  showScreen("screenArticle");
+}
+
+function renderImageGrid(){
+  const art=ARTICLES[currentTab];
+  const grid=document.getElementById("imgGrid");
+  grid.innerHTML="";
+  art.sections.forEach((sec,si)=>{
+    const g=document.createElement("div");
+    g.className="sec-group";
+    const num=document.createElement("div");
+    num.className="sec-num";
+    num.textContent=`소주제 ${si+1} · ${sec.title.substring(0,16)}${sec.title.length>16?"…":""}`;
+    g.appendChild(num);
+    if(sec.images.length===1){
+      const card=makeCard(sec.images[0],sec.title,sec.id,"130px");
+      g.appendChild(card);
+    } else {
+      const row=document.createElement("div");
+      row.className="img-row";
+      sec.images.forEach(imgId=>{row.appendChild(makeCard(imgId,sec.title,sec.id,"110px"))});
+      g.appendChild(row);
+    }
+    grid.appendChild(g);
+  });
+  updateSelCount();
+}
+
+function makeCard(imgId,title,secId,h){
+  const card=document.createElement("div");
+  card.className="img-card";
+  card.dataset.imgId=imgId;card.dataset.secId=secId;
+  card.style.height=h;
+  const img=document.createElement("img");
+  img.src=IMAGES[imgId];img.alt=title;
+  card.appendChild(img);
+  const badge=document.createElement("div");
+  badge.className="sec-badge";
+  badge.textContent=title.length>22?title.substring(0,22)+"…":title;
+  card.appendChild(badge);
+  if(selected.has(secId))card.classList.add("selected");
+  card.addEventListener("click",()=>toggleSection(secId));
+  return card;
+}
+
+function toggleSection(secId){
+  if(selected.has(secId)){
+    selected.delete(secId);
+    document.querySelectorAll(`.img-card[data-sec-id="${secId}"]`).forEach(c=>c.classList.remove("selected"));
+  } else {
+    selected.add(secId);
+    document.querySelectorAll(`.img-card[data-sec-id="${secId}"]`).forEach(c=>c.classList.add("selected"));
+  }
+  updateSelCount();
+}
+
+function updateSelCount(){
+  const n=selected.size;
+  document.getElementById("selCount").textContent=`선택된 소주제: ${n}`;
+  document.getElementById("viewBtn").disabled=n===0;
+}
+
+function clearSelection(){
+  selected.clear();
+  document.querySelectorAll(".img-card").forEach(c=>c.classList.remove("selected"));
+  updateSelCount();renderEmpty();
+}
+
+function renderEmpty(){
+  document.getElementById("articleViewer").innerHTML=`<div class="av-empty"><p>좌측에서 이미지를 선택하면<br>관련 기사가 이곳에 나타납니다</p><span>Click images on the left to explore articles</span></div>`;
+}
+
+function viewSelected(){
+  if(selected.size===0)return;
+  const art=ARTICLES[currentTab];
+  const selSecs=art.sections.filter(s=>selected.has(s.id));
+  let html=`<div class="art-kicker">${art.subtitle}</div>`;
+  html+=`<h1 class="art-title">${art.title}</h1>`;
+  html+=`<p class="art-intro">${art.intro}</p>`;
+  if(selSecs.length>1){
+    html+='<div class="sec-chips">';
+    selSecs.forEach((sec,i)=>{
+      const short=sec.title.split("—")[0].trim();
+      html+=`<span class="sec-chip" onclick="scrollToSec('${sec.id}')">${i+1}. ${short.length>16?short.substring(0,16)+"…":short}</span>`;
+    });
+    html+='</div>';
+  }
+  selSecs.forEach((sec,i)=>{
+    html+=`<div class="art-section" id="sec-${sec.id}">`;
+    html+=`<p class="sec-label">소주제 ${i+1}</p>`;
+    html+=`<h2 class="sec-title">${sec.title}</h2>`;
+    html+=`<div class="sec-imgs">`;
+    sec.images.forEach(imgId=>{html+=`<img src="${IMAGES[imgId]}" alt="">`});
+    html+=`</div>`;
+    html+=`<p class="sec-caption">${sec.captions.join(" &nbsp;·&nbsp; ")}</p>`;
+    const paras=sec.content.split("\n\n").filter(p=>p.trim());
+    html+='<div class="sec-body">';
+    paras.forEach(p=>{html+=`<p>${p.replace(/\n/g,"<br>")}</p>`});
+    html+='</div>';
+    if(i<selSecs.length-1)html+='<div class="art-divider"></div>';
+    html+='</div>';
+  });
+  const viewer=document.getElementById("articleViewer");
+  viewer.innerHTML=`<div class="article-viewer">${html}</div>`;
+  document.getElementById("articlePanel").scrollTop=0;
+}
+
+function scrollToSec(secId){
+  const el=document.getElementById("sec-"+secId);
+  if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+const IMG_LIST=[];
+const IMG_INDEX={};
+["choi","lee"].forEach(tab=>{
+  ARTICLES[tab].sections.forEach(sec=>{
+    sec.images.forEach(imgId=>{
+      IMG_LIST.push(imgId);
+      IMG_INDEX[imgId]={tab,secId:sec.id};
+    });
+  });
+});
+
+function renderMarquee(){
+  const track=document.getElementById("marqueeTrack");
+  const itemsHtml=IMG_LIST.map(id=>`<img src="${IMAGES[id]}" alt="" onclick="goToImage('${id}')">`).join("");
+  track.innerHTML=itemsHtml+itemsHtml;
+}
+
+activateTab("choi");
+renderEmpty();
+renderMarquee();
+</script>
+</body>
+</html>
